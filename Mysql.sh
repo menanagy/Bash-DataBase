@@ -1,13 +1,25 @@
 #!/usr/bin/bash
 databasename="Test"
-if [[ -d DataBase ]]
+if [[ -d DataBases ]]
 then
-echo "Data Base init : I Create Data Base Folder "
+printf "Data Base init : I Create Data Base Folder \n\n"
 else
-mkdir DataBase
-echo "Data Base init : I Create Data Base Folder "
+mkdir DataBases
+printf "Data Base init : I Create Data Base Folder \n\n"
 fi
-cd ./DataBase
+
+DisplayDatabases () {
+			cd ./DataBases #Go to DataBases Folder
+			#list database directories ans ask for select one
+			arr_databases=($(ls)) #use the syntax ${#arr[@]} to calculate its length.
+			if [[ ${#arr_databases[@]} > 0 ]]; then
+				ls #Display Folders in DataBases Folder
+                        else
+				printf "\n Databes is an empty ==> No DataBase \n"
+			fi
+			cd .. #Back to Project Folder 
+}
+
 
 while true
 do	
@@ -16,31 +28,51 @@ select  choise in "Create Database" "List DataBase" "Connect DataBashe" "Drop Da
 do
     case $choise in
         "Create Database")
-			echo "Enter Name of DataBase : "
+			printf "\n Enter Name of DataBase : "
 			read databasename
-           		mkdir $databasename
+			if ! [[ $databasename =~ ^[a-zA-Z]+$ ]]; then
+			  	echo "$databasename is not string value,please tray again!!"
+			else			
+				cd ./DataBases #Go to DataBases Folder
+				#str > check exist
+				if [[ -d $databasename ]]; then
+					echo "$databasename data base already exsit,please try again"
+				else
+					mkdir $databasename
+					printf "\n$databasename has been created\n"			
+				fi
+				cd ..	
+			fi
 			break
-           		  ;;
+           		;;
         "List DataBase")
-           		ls -F | grep \/$
-			#ls -R
+			printf "\n Your DataBases  : \n"
+			DisplayDatabases			
 			break
            		;;
 	"Connect DataBashe")
-                        echo "Enter Name of DataBase : "
+                        echo "\n Choose Name of DataBase  To Connect: "
+			DisplayDatabases
 			read databasename
 			. ./database.sh
+			cd .. #Back to Project Folder  
 			break ;;
-	 "Drop DataBase")
-                        echo "Enter Name of DataBase : "
+	 "Drop DataBase")	
+                        printf "\n Choose Name of DataBase : "
+			DisplayDatabases
+			cd ./DataBases #Go to DataBases Folder		
 			read databasename
-			 rm -r $databasename
+			rm -r $databasename
+			cd .. #Back to Project Folder  
 			break ;;
         Quit)
             break 2 ;;
         *)
-          echo "invalid option $REPLY";;
+          echo "\ninvalid option $REPLY";;
     esac
 done
 echo "_________________________________________________________________________"
 done
+
+
+

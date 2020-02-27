@@ -1,51 +1,64 @@
 #!/usr/bin/bash
-cd ./$databasename
+pwd
+cd ./DataBases/$databasename #Go to Specific DataBase
+DisplayTable(){
+	#list database directories ans ask for select one
+	arr_databases=($(ls)) #use the syntax ${#arr[@]} to calculate its length.
+	if [[ ${#arr_databases[@]} > 0 ]]; then
+		ls
+        else
+		printf "\n Databes is an empty ==> No Tables \n"
+	fi
+}
+
 while true
 do
 PS3='Enter Number of Command: '
-select  choise in "Create Table" "List Table" "Drop Table" "Insert Table" "Select From Table" "Delet From Table" Quit
+select  choise in "Create Table" "List Table" "Drop Table" "Insert Table" "Select From Table" "Delet From Table" "BacK"
 do
     case $choise in
         "Create Table")
-			pwd
-                        echo "Creat Table Choise : Enter Name of Table : "
+                        printf "\nCreat Table Choise : Enter Name of Table : "
                         read tableName
-			touch $tableName.txt
+			touch $tableName
+			touch $tableName.data
                         break
                         ;;
         "List Table")
-                        echo "List Table Choise : Enter Name of Table : "
-                        ls -l
-                        #ls -R
+                        printf "\n Lists of Table\n"
+			DisplayTable
                         break
                         ;;
         "Drop Table")
-                        echo "Drop Table Choise : Enter Name of Table : "
+                        printf "\n Lists of  Table Choose one for Dropping : "
+			DisplayTable
                         read tableName
-			rm tableName
+			rm $tableName
+			rm $tableName.data
                         break
                         ;;
          "Insert Table")
-                        echo "Insert Table Choise : Enter Name of DataBase : "
-                        read databasename
-                         rm -r $databasename
+                        printf "\nInsert Table Choise : Enter Name of DataBase : "
                         break
                         ;;
 	"Select From Table")
-                        echo "Select From Table Choise : Enter Name of DataBase : "
-				break
-				;;
+			
+                        printf "\n Lists of  Table Choose one for Display : \n"
+			DisplayTable
+			read tableName
+			cat tableName
+			break
+			;;
 	"Delet From Table")
-			echo "Delet From Table :"
+			printf "\n Delet From Table : \n"
 				break
 				;;
-	"Quit")
-		cd ..
-		#. ./Mysql.sh
+	"BacK")
+		cd .. #Back to DataBases Folder
 		break 2
 		;;
         *)
-          echo "invalid option $REPLY";;
+          echo "\n invalid option $REPLY";;
 esac
 done 
 echo "_________________________________________________________________________"
