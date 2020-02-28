@@ -2,10 +2,10 @@
 databasename="Test"
 if [[ -d DataBases ]]
 then
-printf "Data Base init : I Create Data Base Folder \n\n"
+printf " \n Data Base init : I Create Data Base Folder \n\n"
 else
 mkdir DataBases
-printf "Data Base init : I Create Data Base Folder \n\n"
+printf " \n Data Base init : I Create Data Base Folder \n\n"
 fi
 
 DisplayDatabases () {
@@ -51,7 +51,7 @@ do
 			break
            		;;
 	"Connect DataBashe")
-                        echo "\n Choose Name of DataBase  To Connect: "
+                        echo " \n Choose Name of DataBase  To Connect: "
 			DisplayDatabases
 			read databasename
 			. ./database.sh

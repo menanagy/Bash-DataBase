@@ -1,6 +1,15 @@
 #!/usr/bin/bash
 pwd
-cd ./DataBases/$databasename #Go to Specific DataBase
+EnterDataBase=1
+cd ./DataBases 
+if [[ ! -d $databasename ]]; then
+	echo "please enter an existing database "
+	EnterDataBase=20
+else
+	cd ./$databasename #Go to Specific DataBase
+	echo "You Are Connected Wit $databasename DataBase "
+fi
+
 DisplayTable(){
 	#list database directories ans ask for select one
 	arr_databases=($(ls)) #use the syntax ${#arr[@]} to calculate its length.
@@ -11,7 +20,7 @@ DisplayTable(){
 	fi
 }
 
-while true
+while [$EnterDataBase -le 5]
 do
 PS3='Enter Number of Command: '
 select  choise in "Create Table" "List Table" "Drop Table" "Insert Table" "Select From Table" "Delet From Table" "BacK"
