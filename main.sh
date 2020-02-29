@@ -1,25 +1,6 @@
 #!/usr/bin/bash
-databasename="Test"
-if [[ -d DataBases ]]
-then
-printf " \n Data Base init : I Create Data Base Folder \n\n"
-else
-mkdir DataBases
-printf " \n Data Base init : I Create Data Base Folder \n\n"
-fi
-
-DisplayDatabases () {
-			cd ./DataBases #Go to DataBases Folder
-			#list database directories ans ask for select one
-			arr_databases=($(ls)) #use the syntax ${#arr[@]} to calculate its length.
-			if [[ ${#arr_databases[@]} > 0 ]]; then
-				ls #Display Folders in DataBases Folder
-                        else
-				printf "\n Databes is an empty ==> No DataBase \n"
-			fi
-			cd .. #Back to Project Folder 
-}
-
+source createTable.sh
+createDataBaseFolder
 
 while true
 do	
@@ -54,16 +35,18 @@ do
                         echo " \n Choose Name of DataBase  To Connect: "
 			DisplayDatabases
 			read databasename
+			checkNameExist	
 			. ./database.sh
 			cd .. #Back to Project Folder  
 			break ;;
 	 "Drop DataBase")	
                         printf "\n Choose Name of DataBase : "
-			DisplayDatabases
-			cd ./DataBases #Go to DataBases Folder		
+			DisplayDatabases				
 			read databasename
+			checkNameExist	
+			cd ./DataBases #Go to DataBases Folder
 			rm -r $databasename
-			cd .. #Back to Project Folder  
+			cd .. #Back to Project Folder 
 			break ;;
         Quit)
             break 2 ;;

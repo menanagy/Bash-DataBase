@@ -1,36 +1,19 @@
 #!/usr/bin/bash
-pwd
-EnterDataBase=1
-cd ./DataBases 
-if [[ ! -d $databasename ]]; then
-	echo "please enter an existing database "
-	EnterDataBase=20
-else
-	cd ./$databasename #Go to Specific DataBase
-	echo "You Are Connected Wit $databasename DataBase "
-fi
+source createTable.sh
+#pwd
+checkDataBaseFolder
 
-DisplayTable(){
-	#list database directories ans ask for select one
-	arr_databases=($(ls)) #use the syntax ${#arr[@]} to calculate its length.
-	if [[ ${#arr_databases[@]} > 0 ]]; then
-		ls
-        else
-		printf "\n Databes is an empty ==> No Tables \n"
-	fi
-}
-
-while [$EnterDataBase -le 5]
+while true #[$EnterDataBase -eq 1]
 do
 PS3='Enter Number of Command: '
 select  choise in "Create Table" "List Table" "Drop Table" "Insert Table" "Select From Table" "Delet From Table" "BacK"
 do
     case $choise in
         "Create Table")
-                        printf "\nCreat Table Choise : Enter Name of Table : "
-                        read tableName
-			touch $tableName
-			touch $tableName.data
+			printf "Old Tables : "
+			DisplayTable
+                        printf "\n Enter Name of New Table : "
+			createTable
                         break
                         ;;
         "List Table")
@@ -43,25 +26,93 @@ do
 			DisplayTable
                         read tableName
 			rm $tableName
-			rm $tableName.data
+			#rm $tableName.data
                         break
                         ;;
          "Insert Table")
-                        printf "\nInsert Table Choise : Enter Name of DataBase : "
+			DisplayTable
+			
+			arr_tables=($(ls))
+			if [[ ${#arr_tables[@]} > 0 ]]; then
+				printf " Old Table : "
+				echo ${arr_tables[@]}
+                        	printf "\nInsert Table Choise : Enter Name of Table : "
+				read tableName
+				if [[ -f $tableName ]]; then
+					read -a arr_data_type <<< `sed '1!d' $tableName`
+					#read pk <<< `sed '2!d' $tableName`
+					read -a arr_col_names <<< `sed '2!d' $tableName`
+					echo "Enter Valid Value of Col :"
+					echo ${arr_col_names[@]}
+					#take cols data and check data type and pk
+					typeset -i i=0
+					while [[ $i -lt ${#arr_data_type[@]} ]] #==> Loop 1
+					do	
+						#case of int
+						if [[ arr_data_type[i] -eq 1 ]]; then
+							while [ true ]
+							#echo $intFlage
+							do
+								printf "\n\n Enter Value  of ${arr_col_names[i]} (is integer)'\n\n"
+								read userData
+								if ! [[ $userData =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]; then
+								  	echo "$userData is not an integer value,please try again !!"
+								else
+									#if [[ $i == $pk ]]
+									#else
+									#echo "not pk int col"
+									userInsertArray[i]="$userData" #append in userInsertArray[i]
+									printf "\n$userData has been added successfully\n"	
+									#fi
+									break #to another col
+								fi
+								
+							done						
+						else #case of string	
+							while [ true ]
+							#echo $intFlage
+							do
+								printf "\n\n Enter Value  of ${arr_col_names[i]} (is String)'\n\n"
+								read userData
+								if ! [[ $userData =~ ^[a-zA-Z]+$ ]]; then
+									echo "$userData is not string value,please try again !!"
+								else
+									#if [[ $i == $pk ]]
+									#else
+										#echo "not pk int col"
+										userInsertArray[i]="$userData" #append in userInsertArray[i]
+										printf "\n$userData has been added successfully\n"	
+									#fi
+									break #to another col
+								fi
+								
+							done			
+						fi
+					i=$i+1 #increment index
+					done
+					echo ${userInsertArray[@]} >> $tableName
+					printf "\nThe record has been added successfully\n"
+					echo ${userInsertArray[@]}
+				else
+					echo "Sorry  Table Name Not Found"				
+				fi
+			else
+				echo "Sorry No Table please Enter ==> 1 for Create Table"			
+			fi			
+
                         break
                         ;;
-	"Select From Table")
-			
+	"Select From Table")			
                         printf "\n Lists of  Table Choose one for Display : \n"
 			DisplayTable
 			read tableName
-			cat tableName
+			cat $tableName
 			break
 			;;
 	"Delet From Table")
 			printf "\n Delet From Table : \n"
-				break
-				;;
+			break
+			;;
 	"BacK")
 		cd .. #Back to DataBases Folder
 		break 2
@@ -72,3 +123,6 @@ esac
 done 
 echo "_________________________________________________________________________"
 done
+echo "Finish While"
+
+
