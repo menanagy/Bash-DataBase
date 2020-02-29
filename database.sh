@@ -1,12 +1,12 @@
 #!/usr/bin/bash
-source createTable.sh
+source functions.sh
 #pwd
 checkDataBaseFolder
 
 while true #[$EnterDataBase -eq 1]
 do
 PS3='Enter Number of Command: '
-select  choise in "Create Table" "List Table" "Drop Table" "Insert Table" "Select From Table" "Delet From Table" "BacK"
+select  choise in "Create Table" "List Table" "Drop Table" "Insert Table" "Select From Table" "BacK"
 do
     case $choise in
         "Create Table")
@@ -17,7 +17,7 @@ do
                         break
                         ;;
         "List Table")
-                        printf "\n Lists of Table\n"
+                        printf "List of Tables :"
 			DisplayTable
                         break
                         ;;
@@ -40,8 +40,8 @@ do
 				read tableName
 				if [[ -f $tableName ]]; then
 					read -a arr_data_type <<< `sed '1!d' $tableName`
-					#read pk <<< `sed '2!d' $tableName`
-					read -a arr_col_names <<< `sed '2!d' $tableName`
+					read pk <<< `sed '2!d' $tableName`
+					read -a arr_col_names <<< `sed '3!d' $tableName`
 					echo "Enter Valid Value of Col :"
 					echo ${arr_col_names[@]}
 					#take cols data and check data type and pk
@@ -53,36 +53,50 @@ do
 							while [ true ]
 							#echo $intFlage
 							do
-								printf "\n\n Enter Value  of ${arr_col_names[i]} (is integer)'\n\n"
+								if [[ $i == $pk ]];then
+									echo "This is a primary key Field"
+								else 
+									echo "This is not a primary key  Field"
+								fi
+
+								printf "Enter Value  of ${arr_col_names[i]} (is integer)'\n"
 								read userData
 								if ! [[ $userData =~ ^[+-]?[0-9]+\.?[0-9]*$ ]]; then
 								  	echo "$userData is not an integer value,please try again !!"
 								else
-									#if [[ $i == $pk ]]
-									#else
-									#echo "not pk int col"
-									userInsertArray[i]="$userData" #append in userInsertArray[i]
-									printf "\n$userData has been added successfully\n"	
-									#fi
+									if [[ $i == $pk ]]; then
+										#echo "it is integer primrary Key"
+										checkPrimaryKey	
+									else
+										#echo "it is not primary key"
+										userInsertArray[i]="$userData" #append in userInsertArray[i]
+										printf "\n$userData has been added successfully\n"	
+									fi
 									break #to another col
 								fi
 								
 							done						
 						else #case of string	
 							while [ true ]
-							#echo $intFlage
 							do
-								printf "\n\n Enter Value  of ${arr_col_names[i]} (is String)'\n\n"
+								if [[ $i == $pk ]];then
+									echo "This is a primary key Field"
+								else 
+									echo "This is not a primary key  Field"
+								fi
+								printf "Enter Value  of ${arr_col_names[i]} (is String)'\n"
 								read userData
 								if ! [[ $userData =~ ^[a-zA-Z]+$ ]]; then
 									echo "$userData is not string value,please try again !!"
 								else
-									#if [[ $i == $pk ]]
-									#else
-										#echo "not pk int col"
+									if [[ $i == $pk ]]; then
+										#echo "it is String primrary Key"
+										checkPrimaryKey						
+									else
+										#echo "it is not primary key"
 										userInsertArray[i]="$userData" #append in userInsertArray[i]
 										printf "\n$userData has been added successfully\n"	
-									#fi
+									fi
 									break #to another col
 								fi
 								
@@ -106,13 +120,10 @@ do
                         printf "\n Lists of  Table Choose one for Display : \n"
 			DisplayTable
 			read tableName
-			cat $tableName
+			sed '1,2d' $tableName 
 			break
 			;;
-	"Delet From Table")
-			printf "\n Delet From Table : \n"
-			break
-			;;
+
 	"BacK")
 		cd .. #Back to DataBases Folder
 		break 2

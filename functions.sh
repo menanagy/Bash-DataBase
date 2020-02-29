@@ -1,6 +1,5 @@
 createDataBaseFolder(){
 echo "###########################################################"
-source createTable.sh
 databasename="Test"
 if [[ -d DataBases ]]
 then
@@ -37,6 +36,7 @@ fi
 checkDataBaseFolder(){
 typeset -i EnterDataBase=1
 cd ./DataBases 
+echo "###########################################################"
 if [[ ! -d $databasename ]]; then
 	echo "please enter an existing database "
 	EnterDataBase=0
@@ -44,8 +44,8 @@ else
 	EnterDataBase=1
 	cd ./$databasename #Go to Specific DataBase
 	echo "You Are Connected Wit $databasename DataBase "
-	pwd
 fi
+echo "###########################################################"
 }
 DisplayDatabases () {
 			cd ./DataBases #Go to DataBases Folder
@@ -75,7 +75,6 @@ DisplayTable(){
 	arr_Tables=($(ls)) #use the syntax ${#arr[@]} to calculate its length.
 	if [[ ${#arr_databases[@]} > 0 ]]; then
 		ls
-		printf "\n"
         else
 		printf "\n Databes is an empty ==> No Tables \n"
 	fi
@@ -119,7 +118,48 @@ else
 	i=$i+1
 	done 
 	echo ${type_arr[@]} >> $table_name # >> append
+	addPrimaryKey
 	echo ${col_arr[@]} >> $table_name # >> append
 	printf "\nTable $table_name has been added successfully\n"
 fi
+}
+
+addPrimaryKey(){
+	while [ true ]
+	do
+		printf "\nplease enter Your Primar Key index Choose from 0 to ${#col_arr[@]} )\n"
+		printf "\nyour table col.(s)\n"
+		echo ${col_arr[@]}
+		echo "if you are finished please press enter"
+		read  pk
+			if ! [[ $pk =~ ^[0-9]+$ ]]
+			then
+			  printf "\n$pk is not a +ve integer value,please try again!!\n"
+			else
+
+				if [[ $pk -lt ${#col_arr[@]} ]]
+				then  
+		
+					echo $pk >> $table_name
+					break;
+				else
+					printf "\nPlease enter right index!\n"
+				fi
+			fi
+	done
+}
+
+checkPrimaryKey(){
+	#search for pk, true print error msg, false append and break
+	typeset -i pkCol=$i+1
+	if [[ $(sed '1,3d' $tableName | cut -d " " -f $pkCol | grep -x $userData | sed '1!d') = $userData ]] ; then 
+		printf "\nPrimary key value is exist please try again\n"
+		i=$i-1
+	else
+		echo "pk value is not exist"
+		userInsertArray[i]="$userData"
+		printf "\n$userData has been added successfully\n"
+
+	fi
+
 }

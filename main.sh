@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-source createTable.sh
+source functions.sh
 createDataBaseFolder
 
 while true
